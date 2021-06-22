@@ -2,6 +2,7 @@
   "name": "jam-bots",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "license": "MIT",
   "scripts": {
     "start": "chrode bot.js",
@@ -9,7 +10,10 @@
   },
   "dependencies": {
     "chrode": "mitschabaude/chrode",
-    "jam-core": "^0.3.7"
+    "esbuild": "^0.12.9",
+    "jam-core": "^0.3.7",
+    "node-static": "^0.7.11",
+    "puppeteer": "^10.0.0"
   },
   "devDependencies": {
     "eslint": "^7.29.0"
