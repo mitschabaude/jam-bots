@@ -22,7 +22,7 @@ setProps({roomId});
 enterRoom(roomId);
 
 // with a probability 30%, set your own name & avatar within 30 sec
-if (Math.random() < 0.9) {
+if (Math.random() < 0.3) {
   setTimeout(async () => {
     let blob = await fetch('./terminator.jpg').then(r => r.blob());
     let avatar = await new Promise(resolve => {
