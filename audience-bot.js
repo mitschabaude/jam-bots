@@ -1,5 +1,4 @@
 import {createJam} from 'jam-core';
-import terminator from './terminator.json';
 
 const [state, api] = createJam({
   jamConfig: {
@@ -23,19 +22,25 @@ setProps({roomId});
 enterRoom(roomId);
 
 // with a probability 30%, set your own name & avatar within 30 sec
-if (Math.random() < 0.3) {
+if (Math.random() < 0.9) {
   setTimeout(async () => {
+    let blob = await fetch('./terminator.jpg').then(r => r.blob());
+    let avatar = await new Promise(resolve => {
+      let reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.addEventListener('load', () => resolve(reader.result));
+    });
     updateInfo({
-      name: 'Unit ' + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[(Math.random() * 26) | 0],
-      avatar: terminator,
+      name: 'Arnold ' + ((Math.random() * 100) | 0),
+      avatar,
     });
   }, 10000 + Math.random() * 20000);
 }
 
-// react with heart to someone speaking
+// sometimes react with heart to someone speaking
 let nSpeaking = 0;
 onState('speaking', speaking => {
-  if (speaking.size > nSpeaking) {
+  if (speaking.size > nSpeaking && Math.random() < 0.2) {
     sendReaction('❤️');
   }
   nSpeaking = speaking.size;

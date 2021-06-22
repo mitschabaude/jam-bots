@@ -8,7 +8,7 @@
     "pantry": "LOCAL=1 PORT=3001 JAM_SFU=1 node ../jam/pantry/bin/www"
   },
   "dependencies": {
-    "chrode": "^0.1.3",
+    "chrode": "mitschabaude/chrode",
     "jam-core": "^0.3.7"
   },
   "devDependencies": {
