@@ -25,7 +25,7 @@ setState('handRaised', true);
 // once speaker, periodically play random audio
 until(state, 'iAmSpeaker').then(() => {
   setTimeout(() => playRandomSnippet(), 1000);
-  setInterval(() => playRandomSnippet(), 10000);
+  setInterval(() => playRandomSnippet(), 15000 - 7500 * Math.random());
 });
 async function playRandomSnippet() {
   let i = (Math.random() * audioSnippets.length) | 0;
