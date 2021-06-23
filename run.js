@@ -1,23 +1,32 @@
 import puppeteer from 'puppeteer';
 import esbuild from 'esbuild';
 import fs from 'fs';
+import path from 'path';
 import http from 'http';
 import nodeStatic from 'node-static';
 
 export default async function run(
-  path,
+  scriptPath,
   n,
-  {noLogs = false, noHeadless = false, noIncognito = false, noParallel = false}
+  {
+    env,
+    browser,
+    noLogs = false,
+    noHeadless = false,
+    noIncognito = false,
+    noParallel = false,
+  }
 ) {
   const port = 8100 + Math.floor(900 * Math.random());
 
   // build JS
   if (!fs.existsSync('/tmp/esbuild'))
     fs.mkdirSync('/tmp/esbuild', {recursive: true});
+  const bundlePath = '/tmp/esbuild/' + path.basename(scriptPath);
   esbuild.buildSync({
     bundle: true,
-    entryPoints: [path],
-    outfile: '/tmp/esbuild/index.js',
+    entryPoints: [scriptPath],
+    outfile: bundlePath,
     target: 'es2020',
     format: 'esm',
   });
@@ -47,13 +56,22 @@ export default async function run(
     }
 
     await page.goto(`http://localhost:${port}`);
-    await page.addScriptTag({
-      type: 'module',
-      path: '/tmp/esbuild/index.js',
-    });
+    await page.evaluate(
+      (env, i) => {
+        window.SCRIPT_INDEX = i;
+        if (env !== undefined)
+          for (let key in env) {
+            window[key] = env[key];
+          }
+      },
+      env,
+      i
+    );
+
+    await page.addScriptTag({type: 'module', path: bundlePath});
   }
 
-  let browser = await puppeteer.launch({headless: !noHeadless});
+  browser = browser ?? (await puppeteer.launch({headless: !noHeadless}));
   let newContext = !noIncognito
     ? () => browser.createIncognitoBrowserContext()
     : () => browser.defaultBrowserContext();
