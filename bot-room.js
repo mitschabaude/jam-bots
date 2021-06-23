@@ -13,6 +13,12 @@ const cliOptions = [
     description: 'The room id.',
   },
   {
+    name: 'jam-domain',
+    type: String,
+    defaultValue: 'beta.jam.systems',
+    description: 'The Jam domain used by bots, default is `beta.jam.systems`',
+  },
+  {
     name: 'help',
     alias: 'h',
     type: Boolean,
@@ -34,6 +40,19 @@ const cliOptions = [
     description: 'The number of audience bots.',
   },
   {
+    name: 'local-pantry',
+    alias: 'l',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Sets the pantry URL to `http://localhost:3001`.',
+  },
+  {
+    name: 'sfu',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Use an SFU.',
+  },
+  {
     name: 'no-mod',
     type: Boolean,
     defaultValue: false,
@@ -49,10 +68,13 @@ const cliOptions = [
 
 let {
   'room-id': roomId,
+  'jam-domain': jamDomain,
+  'local-pantry': localPantry,
   help,
   'no-mod': noModerator,
   speakers,
   audience,
+  sfu,
   'no-headless': noHeadless,
 } = commandLineArgs(cliOptions);
 if (help) {
@@ -74,13 +96,15 @@ if (help) {
 (async () => {
   let jamConfig = {
     urls: {
-      pantry: `http://localhost:3001`,
-      stun: `stun:stun.beta.jam.systems:3478`,
-      turn: `turn:turn.beta.jam.systems:3478`,
+      pantry: localPantry
+        ? 'http://localhost:3001'
+        : `https://${jamDomain}/_/pantry`,
+      stun: `stun:stun.${jamDomain}:3478`,
+      turn: `turn:turn.${jamDomain}:3478`,
       turnCredentials: {username: 'test', credential: 'yieChoi0PeoKo8ni'},
     },
     development: true,
-    sfu: true,
+    sfu,
   };
   let env = {
     roomId,
