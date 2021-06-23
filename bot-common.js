@@ -1,21 +1,13 @@
 const jamOptions = {
-  jamConfig: window.jamConfig ?? {
-    urls: {
-      pantry: `http://localhost:3001`,
-      stun: `stun:stun.beta.jam.systems:3478`,
-      turn: `turn:turn.beta.jam.systems:3478`,
-      turnCredentials: {username: 'test', credential: 'yieChoi0PeoKo8ni'},
-    },
-    development: false,
-    sfu: false,
-  },
-  debug: false,
+  jamConfig: window.jamConfig,
+  debug: true,
 };
 
-let roomId = window.roomId ?? 'bot-test';
-console.log('roomId', roomId);
+const roomId = window.roomId ?? 'bot-test';
+const deviceId = window.deviceId ?? '';
+const botIndex = window.SCRIPT_INDEX;
 
-export {jamOptions, roomId, getAvatar};
+export {jamOptions, roomId, deviceId, botIndex, getAvatar};
 
 async function getAvatar() {
   let blob = await fetch('./terminator.jpg').then(r => r.blob());

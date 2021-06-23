@@ -1,5 +1,5 @@
 import {createJam, importDefaultIdentity, on} from 'jam-core';
-import {getAvatar, jamOptions, roomId} from './bot-common';
+import {botIndex, deviceId, getAvatar, jamOptions, roomId} from './bot-common';
 
 (async () => {
   importDefaultIdentity({
@@ -7,7 +7,7 @@ import {getAvatar, jamOptions, roomId} from './bot-common';
       name: 'Arnold',
       avatar: await getAvatar(),
     },
-    seed: 'bot-moderator-' + window.SCRIPT_INDEX,
+    seed: `bot-moderator-${deviceId}-${botIndex}`,
   });
 
   let [state, api] = createJam(jamOptions);
@@ -33,7 +33,7 @@ import {getAvatar, jamOptions, roomId} from './bot-common';
     }
   });
 
-  // react to moderators speaking
+  // react to others speaking
   let nSpeaking = 0;
   onState('speaking', speaking => {
     let nSpeaking_ = speaking.size;

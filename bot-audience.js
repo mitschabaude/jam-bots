@@ -1,14 +1,14 @@
 import {createJam, importDefaultIdentity} from 'jam-core';
-import {getAvatar, jamOptions, roomId} from './bot-common';
+import {botIndex, deviceId, getAvatar, jamOptions, roomId} from './bot-common';
 
 (async () => {
   importDefaultIdentity({
-    seed: 'bot-audience-' + window.SCRIPT_INDEX,
+    seed: `bot-audience-${deviceId}-${botIndex}`,
   });
   let [state, api] = createJam(jamOptions);
   const {setProps, enterRoom, onState, sendReaction, updateInfo} = api;
 
-  console.log('AUDIENCE myId', JSON.stringify(state.myId), window.SCRIPT_INDEX);
+  console.log('AUDIENCE myId', JSON.stringify(state.myId), botIndex);
 
   setProps({roomId});
   enterRoom(roomId);
@@ -17,7 +17,7 @@ import {getAvatar, jamOptions, roomId} from './bot-common';
   if (Math.random() < 0.3) {
     setTimeout(async () => {
       updateInfo({
-        name: `Arnold ${100 + window.SCRIPT_INDEX}`,
+        name: `Arnold ${100 + botIndex}`,
         avatar: await getAvatar(),
       });
     }, 10000 + Math.random() * 20000);

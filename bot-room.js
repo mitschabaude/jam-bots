@@ -1,16 +1,104 @@
 import puppeteer from 'puppeteer';
+import commandLineArgs from 'command-line-args';
+import commandLineUsage from 'command-line-usage';
 import run from './run.js';
+import deviceId from './device-id.js';
 
-const nSpeakers = 1;
-const nAudience = 2;
-let env = {roomId: 'bot-test-4'};
+const cliOptions = [
+  {
+    name: 'room-id',
+    type: String,
+    defaultOption: true,
+    defaultValue: 'bot-test',
+    description: 'The room id.',
+  },
+  {
+    name: 'help',
+    alias: 'h',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Print this information.',
+  },
+  {
+    name: 'speakers',
+    alias: 's',
+    type: Number,
+    defaultValue: 2,
+    description: 'The number of speaker bots.',
+  },
+  {
+    name: 'audience',
+    alias: 'a',
+    type: Number,
+    defaultValue: 5,
+    description: 'The number of audience bots.',
+  },
+  {
+    name: 'no-mod',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Do not invite moderator bot.',
+  },
+  {
+    name: 'no-headless',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Open the Chrome browser UI that runs your scripts.',
+  },
+];
+
+let {
+  'room-id': roomId,
+  help,
+  'no-mod': noModerator,
+  speakers,
+  audience,
+  'no-headless': noHeadless,
+} = commandLineArgs(cliOptions);
+if (help) {
+  console.log(
+    commandLineUsage([
+      {
+        header: 'Jam Bot Room CLI',
+        content: ['node bot-room.js [{underline room-id}] [options]'],
+      },
+      {
+        header: 'Options',
+        optionList: cliOptions,
+      },
+    ])
+  );
+  process.exit(1);
+}
 
 (async () => {
-  let browser = await puppeteer.launch({headless: true});
+  let jamConfig = {
+    urls: {
+      pantry: `http://localhost:3001`,
+      stun: `stun:stun.beta.jam.systems:3478`,
+      turn: `turn:turn.beta.jam.systems:3478`,
+      turnCredentials: {username: 'test', credential: 'yieChoi0PeoKo8ni'},
+    },
+    development: true,
+    sfu: true,
+  };
+  let env = {
+    roomId,
+    deviceId: await deviceId('jam'),
+    jamConfig,
+  };
+  console.log(`/${roomId}`, jamConfig.urls);
 
-  run('bot-moderator.js', 1, {env, browser, noLogs: true});
-  await new Promise(r => setTimeout(r, 3000));
-
-  run('bot-speaker.js', nSpeakers, {env, browser, noLogs: false});
-  run('bot-audience.js', nAudience, {env, browser, noLogs: true});
+  console.log('starting puppeteer...');
+  let browser = await puppeteer.launch({headless: !noHeadless});
+  if (!noModerator) {
+    console.log('starting moderator and trying to create room...');
+    run('bot-moderator.js', 1, {env, browser, noLogs: true});
+    await new Promise(r => setTimeout(r, 3000));
+  }
+  console.log(`starting ${speakers} speaker and ${audience} audience bots`);
+  if (speakers > 0)
+    run('bot-speaker.js', speakers, {env, browser, noLogs: true});
+  if (audience > 0)
+    run('bot-audience.js', audience, {env, browser, noLogs: true});
 })();
