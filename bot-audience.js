@@ -13,14 +13,14 @@ import {botIndex, deviceId, getAvatar, jamOptions, roomId} from './bot-common';
   setProps({roomId});
   enterRoom(roomId);
 
-  // with a probability 30%, set your own name & avatar within 30 sec
-  if (Math.random() < 0.3) {
+  // with a probability 10%, set your own name & avatar within 60 sec
+  if (Math.random() < 0.1) {
     setTimeout(async () => {
       updateInfo({
         name: `Arnold ${100 + botIndex}`,
         avatar: await getAvatar(),
       });
-    }, 10000 + Math.random() * 20000);
+    }, 10000 + Math.random() * 50000);
   }
 
   // sometimes react with heart to someone speaking
@@ -34,7 +34,7 @@ import {botIndex, deviceId, getAvatar, jamOptions, roomId} from './bot-common';
 
   // random reaction storms
   setInterval(async () => {
-    if (Math.random() < 0.005) {
+    if (Math.random() < 0.0025) {
       for (let i = 0; i < 20; i++) {
         sendReaction('😅');
         await new Promise(r => setTimeout(r, 50));
