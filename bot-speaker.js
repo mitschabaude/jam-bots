@@ -38,7 +38,7 @@ import {botIndex, deviceId, getAvatar, jamOptions, roomId} from './bot-common';
     let snippet = audioSnippets[i];
     let audioBuffer = audioBuffers[snippet];
     if (audioBuffer === undefined) {
-      let response = await fetch(`./audio-snippets/${snippet}`);
+      let response = await fetch(`./assets/${snippet}`);
       let audioData = await response.arrayBuffer();
       audioBuffer = await ctx.decodeAudioData(audioData);
       audioBuffers[snippet] = audioBuffer;

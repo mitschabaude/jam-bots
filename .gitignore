@@ -1,1 +1,3 @@
 node_modules/
+aws-lambda/build
+aws-lambda/assets

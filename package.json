@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "chrode": "mitschabaude/chrode",
+    "chrome-aws-lambda": "^10.0.0",
     "command-line-args": "^5.1.1",
     "command-line-usage": "^6.1.1",
     "esbuild": "^0.12.9",
+    "fs-extra": "^10.0.0",
     "jam-core": "link:../jam/ui/jam-core.ts",
     "node-static": "^0.7.11",
     "puppeteer": "^10.0.0"

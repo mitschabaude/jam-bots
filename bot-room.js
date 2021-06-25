@@ -108,7 +108,7 @@ if (help) {
   };
   let env = {
     roomId,
-    deviceId: await deviceId('jam'),
+    instanceId: await deviceId('jam'),
     jamConfig,
   };
   console.log(`/${roomId}`, jamConfig.urls);
