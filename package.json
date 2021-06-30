@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "chrode bot.js",
+    "lambda": "node buildLambda.js && cd aws-lambda && zip -r jam-bot.zip . && aws lambda update-function-code --function-name jam-bot --zip-file fileb://jam-bot.zip",
     "pantry": "LOCAL=1 PORT=3001 JAM_SFU=1 node ../jam/pantry/bin/www"
   },
   "dependencies": {

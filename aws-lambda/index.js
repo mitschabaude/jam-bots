@@ -2,16 +2,17 @@ const {readFile} = require('fs/promises');
 const chromium = require('chrome-aws-lambda');
 const run = require('./runPrebuilt.js');
 
-let botScripts = Promise.all(
+let botScripts = Promise.all([
   readFile('./build/bot-audience.js', {encoding: 'utf8'}),
   readFile('./build/bot-speaker.js', {encoding: 'utf8'}),
-  readFile('./build/bot-moderator.js', {encoding: 'utf8'})
-);
+  readFile('./build/bot-moderator.js', {encoding: 'utf8'}),
+]);
 
 exports.handler = async event => {
+  console.log(event);
+
   let [audienceBot, speakerBot, moderatorBot] = await botScripts;
 
-  console.log(event);
   let {
     roomId = 'bot-test',
     speakers = 1,
