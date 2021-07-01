@@ -3,15 +3,16 @@ const {handler} = require('./aws-lambda');
 
 const local = false;
 let speakers = 5;
-let audience = 40;
-let timeout = 90;
+let audience = 750;
+let timeout = 300;
 
 let commonArgs = {
-  jamDomain: 'jam.dev.plusepsilon.com',
+  jamDomain: 'jam.dyn.plusepsilon.com',
   sfu: true,
 };
 let speakersPerCall = 3;
 let audiencePerCall = 10;
+let sleepBetweenCalls = 1;
 const lambda = new LambdaClient({});
 
 (async () => {
@@ -32,30 +33,30 @@ const lambda = new LambdaClient({});
   let j = 0;
 
   await call('aws', {moderator: true, speakers: firstSpeakers, timeout});
-  await sleep(3);
-  timeout -= 3;
+  await sleep(sleepBetweenCalls);
+  timeout -= sleepBetweenCalls;
 
   for (let i = 0; i < speakerCalls; i++, j++) {
     await call(`${j}`, {speakers: speakersPerCall, timeout});
-    await sleep(3);
-    timeout -= 3;
+    await sleep(sleepBetweenCalls);
+    timeout -= sleepBetweenCalls;
   }
   if (lastSpeakers > 0) {
     await call(`${j}`, {speakers: lastSpeakers, timeout});
-    await sleep(3);
-    timeout -= 3;
+    await sleep(sleepBetweenCalls);
+    timeout -= sleepBetweenCalls;
     j++;
   }
 
   for (let i = 0; i < audienceCalls; i++, j++) {
     await call(`${j}`, {audience: audiencePerCall, timeout});
-    await sleep(3);
-    timeout -= 3;
+    await sleep(sleepBetweenCalls);
+    timeout -= sleepBetweenCalls;
   }
   if (lastAudience > 0) {
     await call(`${j}`, {audience: lastAudience, timeout});
-    await sleep(3);
-    timeout -= 3;
+    await sleep(sleepBetweenCalls);
+    timeout -= sleepBetweenCalls;
   }
 })();
 
