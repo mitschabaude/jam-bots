@@ -1,23 +1,25 @@
 const {readFile} = require('fs/promises');
 const chromium = require('chrome-aws-lambda');
 const run = require('./runPrebuilt.js');
+const path = require('path');
+const absPath = p => path.resolve(__dirname, p);
 
 exports.handler = async event => {
   console.log(event);
 
   let [audienceBot, speakerBot, moderatorBot] = await Promise.all([
-    readFile('./build/bot-audience.js', {encoding: 'utf8'}),
-    readFile('./build/bot-speaker.js', {encoding: 'utf8'}),
-    readFile('./build/bot-moderator.js', {encoding: 'utf8'}),
+    readFile(absPath('./build/bot-audience.js'), {encoding: 'utf8'}),
+    readFile(absPath('./build/bot-speaker.js'), {encoding: 'utf8'}),
+    readFile(absPath('./build/bot-moderator.js'), {encoding: 'utf8'}),
   ]);
 
   let {
     roomId = 'bot-test',
-    speakers = 1,
-    audience = 2,
-    noModerator = false,
-    timeoutMs = 20000,
-    instanceId = 'aws',
+    speakers = 0,
+    audience = 0,
+    moderator = false,
+    timeout = 20,
+    id = 'aws',
     jamDomain = 'beta.jam.systems',
     pantryUrl,
     sfu = false,
@@ -33,12 +35,12 @@ exports.handler = async event => {
     development: true,
     sfu,
   };
-  let env = {roomId, instanceId, jamConfig};
+  let env = {roomId, instanceId: id, jamConfig};
 
   console.log(`/${roomId}`, jamConfig.urls);
 
   console.log('starting puppeteer...');
-  let timeoutPromise = new Promise(r => setTimeout(r, timeoutMs));
+  let timeoutPromise = new Promise(r => setTimeout(r, timeout * 1000));
   let browser = await chromium.puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
@@ -47,7 +49,7 @@ exports.handler = async event => {
     ignoreHTTPSErrors: true,
   });
 
-  if (!noModerator) {
+  if (moderator) {
     console.log('starting moderator and trying to create room...');
     run(moderatorBot, 1, {env, browser, noLogs: true});
     await new Promise(r => setTimeout(r, 3000));

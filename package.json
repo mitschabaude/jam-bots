@@ -2,7 +2,6 @@
   "name": "jam-bots",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "license": "MIT",
   "scripts": {
     "start": "chrode bot.js",
@@ -10,6 +9,7 @@
     "pantry": "LOCAL=1 PORT=3001 JAM_SFU=1 node ../jam/pantry/bin/www"
   },
   "dependencies": {
+    "@aws-sdk/client-lambda": "^3.19.0",
     "chrode": "mitschabaude/chrode",
     "chrome-aws-lambda": "^10.0.0",
     "command-line-args": "^5.1.1",

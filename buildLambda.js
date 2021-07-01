@@ -1,7 +1,7 @@
-import esbuild from 'esbuild';
-import fs from 'fs';
-import fse from 'fs-extra';
-import path from 'path';
+const esbuild = require('esbuild');
+const fs = require('fs');
+const fse = require('fs-extra');
+const path = require('path');
 
 let bundleDir = './aws-lambda/build';
 if (!fs.existsSync(bundleDir)) fs.mkdirSync(bundleDir);
