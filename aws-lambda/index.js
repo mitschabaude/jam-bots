@@ -2,16 +2,14 @@ const {readFile} = require('fs/promises');
 const chromium = require('chrome-aws-lambda');
 const run = require('./runPrebuilt.js');
 
-let botScripts = Promise.all([
-  readFile('./build/bot-audience.js', {encoding: 'utf8'}),
-  readFile('./build/bot-speaker.js', {encoding: 'utf8'}),
-  readFile('./build/bot-moderator.js', {encoding: 'utf8'}),
-]);
-
 exports.handler = async event => {
   console.log(event);
 
-  let [audienceBot, speakerBot, moderatorBot] = await botScripts;
+  let [audienceBot, speakerBot, moderatorBot] = await Promise.all([
+    readFile('./build/bot-audience.js', {encoding: 'utf8'}),
+    readFile('./build/bot-speaker.js', {encoding: 'utf8'}),
+    readFile('./build/bot-moderator.js', {encoding: 'utf8'}),
+  ]);
 
   let {
     roomId = 'bot-test',
@@ -24,16 +22,6 @@ exports.handler = async event => {
     pantryUrl,
     sfu = false,
   } = event;
-
-  let timeoutPromise = new Promise(r => setTimeout(r, timeoutMs));
-
-  let browser = await chromium.puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath,
-    headless: true,
-    ignoreHTTPSErrors: true,
-  });
 
   let jamConfig = {
     urls: {
@@ -50,6 +38,15 @@ exports.handler = async event => {
   console.log(`/${roomId}`, jamConfig.urls);
 
   console.log('starting puppeteer...');
+  let timeoutPromise = new Promise(r => setTimeout(r, timeoutMs));
+  let browser = await chromium.puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath,
+    headless: true,
+    ignoreHTTPSErrors: true,
+  });
+
   if (!noModerator) {
     console.log('starting moderator and trying to create room...');
     run(moderatorBot, 1, {env, browser, noLogs: true});
@@ -61,6 +58,23 @@ exports.handler = async event => {
 
   await timeoutPromise;
   console.log('timeout reached, closing browser...');
-  await browser.close();
+  await new Promise(resolve => {
+    let timeout = setTimeout(() => {
+      resolve();
+      if (browser && browser.process() != null)
+        browser.process().kill('SIGINT');
+    }, 5000);
+    browser
+      .close()
+      .catch(err => {
+        console.log('error closing browser');
+        console.error(err);
+      })
+      .then(() => {
+        clearTimeout(timeout);
+        resolve();
+      });
+  });
+  console.log('returning...');
   return {finished: true};
 };

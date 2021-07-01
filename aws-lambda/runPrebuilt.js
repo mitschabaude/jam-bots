@@ -54,11 +54,15 @@ module.exports = async function run(
   let contexts = await Promise.all(Array(n).fill(0).map(newContext));
   let promises = [];
   for (let i = 0; i < n; i++) {
-    let promise = handleContext(contexts[i], i);
+    let promise = handleContext(contexts[i], i).catch(err => {
+      console.log('error executing script', i);
+      console.error(err);
+    });
     promises.push(promise);
     if (!noParallel) await promise;
   }
   await Promise.all(promises);
+  console.log('finished loading script');
 };
 
 const dummyHtml = `<html>
